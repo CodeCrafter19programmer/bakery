@@ -25,5 +25,8 @@ export const sendToWhatsApp = (items: CartItem[], total: number) => {
   const encodedMessage = encodeURIComponent(message);
   const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
   
-  window.open(whatsappUrl, '_blank');
+  // Use full-page navigation instead of window.open to avoid popup blockers
+  if (typeof window !== 'undefined') {
+    window.location.href = whatsappUrl;
+  }
 };
