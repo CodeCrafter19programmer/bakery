@@ -16,7 +16,7 @@ const Hero = () => {
                 Delicious Cakes & Donuts
               </h1>
               <p className="hero-subtitle">
-                Handcrafted with love in Naluvule, Nansana. 
+                Handcrafted with love in Naluvule, Nansana, Wakiso.
                 Custom cakes for every special occasion!
               </p>
               <div className="d-flex flex-wrap">

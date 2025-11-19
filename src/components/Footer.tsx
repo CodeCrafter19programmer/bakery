@@ -7,11 +7,11 @@ const Footer = () => {
         <div className="footer-content">
           <div className="footer-title">
             <Cake size={32} style={{ display: 'inline', marginRight: '0.5rem' }} />
-            Sweet Delights Bakery
+            Genesis Cakes
           </div>
           <p className="footer-text">
             <MapPin size={16} style={{ display: 'inline', marginRight: '0.3rem' }} />
-            Naluvule, Nansana, Kampala
+            Naluvule, Nansana, Wakiso
           </p>
           <p className="footer-text">
             <Phone size={16} style={{ display: 'inline', marginRight: '0.3rem' }} />
@@ -27,7 +27,7 @@ const Footer = () => {
             Developed by <span className="developer-name">Ntale Stephen</span>
           </p>
           <p>Contact: 0778087986</p>
-          <p className="mt-2">© 2024 Sweet Delights Bakery. All rights reserved.</p>
+          <p className="mt-2">© 2024 Genesis Cakes. All rights reserved.</p>
         </div>
       </div>
     </footer>

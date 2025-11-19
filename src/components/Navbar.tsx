@@ -28,7 +28,7 @@ const Navbar = ({ cartCount, onCartClick }: NavbarProps) => {
       <div className="container">
         <a className="navbar-brand" href="#home" onClick={handleNavClick}>
           <Cake size={32} />
-          Sweet Delights
+          Genesis Cakes
         </a>
         <button
           className="navbar-toggler"

@@ -30,7 +30,7 @@ const Location = () => {
               <h3 className="location-text">We're Located In</h3>
               <p className="location-address">
                 Naluvule, Nansana<br />
-                Kampala, Uganda
+                Wakiso, Uganda
               </p>
               <p className="mt-4" style={{ color: 'var(--text-light)' }}>
                 Order via WhatsApp for delivery or pickup

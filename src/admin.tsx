@@ -88,7 +88,7 @@ function AdminDashboard() {
       <div className="admin-login">
         <div className="login-card">
           <h1 className="login-title">Admin Login</h1>
-          <p className="login-subtitle">Sweet Delights Bakery</p>
+          <p className="login-subtitle">Genesis Cakes</p>
           <form onSubmit={handleLogin}>
             <div className="mb-3">
               <label className="form-label">Username</label>
@@ -123,7 +123,7 @@ function AdminDashboard() {
     <div className="admin-dashboard">
       <nav className="admin-navbar">
         <div className="container-fluid">
-          <h1 className="admin-brand">Sweet Delights Admin</h1>
+          <h1 className="admin-brand">Genesis Cakes Admin</h1>
           <button className="btn btn-outline-light" onClick={handleLogout}>
             <LogOut size={20} className="me-2" />
             Logout
