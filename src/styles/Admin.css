@@ -1,0 +1,140 @@
+.admin-login {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--light-pink) 0%, var(--cream) 50%, var(--pastel-blue) 100%);
+}
+
+.login-card {
+  background: white;
+  padding: 3rem;
+  border-radius: 20px;
+  box-shadow: 0 20px 60px rgba(255, 158, 193, 0.3);
+  max-width: 400px;
+  width: 100%;
+}
+
+.login-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--primary-pink);
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.login-subtitle {
+  text-align: center;
+  color: var(--text-light);
+  margin-bottom: 2rem;
+}
+
+.admin-dashboard {
+  min-height: 100vh;
+  background: var(--cream);
+}
+
+.admin-navbar {
+  background: linear-gradient(135deg, var(--primary-pink) 0%, var(--secondary-pink) 100%);
+  padding: 1.5rem 0;
+  color: white;
+  box-shadow: 0 4px 20px rgba(255, 158, 193, 0.3);
+}
+
+.admin-brand {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin: 0;
+  display: inline-block;
+}
+
+.admin-navbar .container-fluid {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.admin-sidebar {
+  background: white;
+  border-radius: 15px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  position: sticky;
+  top: 20px;
+}
+
+.sidebar-btn {
+  width: 100%;
+  padding: 1rem;
+  border: none;
+  background: transparent;
+  color: var(--text-dark);
+  font-weight: 500;
+  text-align: left;
+  border-radius: 10px;
+  margin-bottom: 0.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.sidebar-btn:hover {
+  background: var(--light-pink);
+  color: var(--primary-pink);
+}
+
+.sidebar-btn.active {
+  background: linear-gradient(135deg, var(--primary-pink) 0%, var(--secondary-pink) 100%);
+  color: white;
+}
+
+.admin-content {
+  background: white;
+  border-radius: 15px;
+  padding: 2rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  min-height: 600px;
+}
+
+.admin-content h2 {
+  font-family: 'Playfair Display', serif;
+  color: var(--text-dark);
+}
+
+.table {
+  margin-top: 1.5rem;
+}
+
+.table thead {
+  background: var(--light-pink);
+}
+
+.table thead th {
+  border: none;
+  color: var(--text-dark);
+  font-weight: 600;
+  padding: 1rem;
+}
+
+.table tbody tr {
+  transition: all 0.3s ease;
+}
+
+.table tbody tr:hover {
+  background: var(--light-pink);
+}
+
+.table tbody td {
+  padding: 1rem;
+  vertical-align: middle;
+}
+
+.badge {
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-weight: 500;
+}

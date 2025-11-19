@@ -1,0 +1,170 @@
+PROMPT FOR BUILDING THE BAKERY WEBSITE
+
+Build a responsive, modern bakery website for a business dealing in all types of cakes and donuts. The website must follow these specifications:
+
+1. General Requirements
+
+Simple, clean, beautiful landing website.
+
+Color theme: modern mix of pink, white, and complementing pastel colors.
+
+Built using React + TypeScript, CSS + Bootstrap 5.
+
+Backend: Node.js.
+
+Database: Supabase for storing:
+
+Order details
+
+Admin dashboard login credentials
+
+Frontend deployment: Vercel
+
+Backend deployment: Render
+
+2. Website Sections
+
+Hero section
+
+Attractive bakery-themed banner
+
+Short welcome text
+
+Buttons: View Gallery, Order Now
+
+Products section
+
+Cakes
+
+Donuts
+
+Other pastries (optional)
+
+Each product card must include:
+
+Image
+
+Name
+
+Price
+
+Description
+
+“Add to Cart” button
+
+“Customize Text” text area (for writing names/message on cakes)
+
+Quantity selector
+
+Gallery section
+
+High-quality display grid
+
+Various images of previously made cakes
+
+Location section
+
+“Located in Naluvule, Nansana”
+
+Google Maps embedded (optional)
+
+Social Media section
+
+Instagram
+
+TikTok
+
+Icons linking externally
+
+WhatsApp Order Integration
+
+When users click Checkout, they are redirected to WhatsApp.
+
+Pre-formatted message includes:
+
+Product name
+
+Price
+
+Quantity
+
+Custom text for cake
+
+Total cost
+
+Greeting and product summary
+
+Example format:
+
+Hello, I would like to place an order:
+- Cake: Vanilla Love Cake
+- Quantity: 1
+- Custom Text: “Happy Birthday Sarah”
+- Price: 45,000 UGX
+- Total: 45,000 UGX
+
+Please confirm availability.
+
+3. Cart System
+
+No user accounts.
+
+Cart stored locally (frontend state).
+
+On checkout → send info to WhatsApp + save order to Supabase.
+
+4. Admin Dashboard
+
+Secure login using credentials stored in Supabase.
+
+Admin can:
+
+View all orders in real time
+
+Update status (pending / completed)
+
+Add product images
+
+Upload new products
+
+5. Pages
+
+Single landing page with sections (scrolling navigation).
+
+Final section (footer) must include:
+
+Developer autograph: “Developed by Ntale Stephen”
+
+Contact: 0778087986
+
+6. Additional Requirements
+
+Fully responsive (mobile-first for small & medium screens).
+
+Smooth scroll navigation.
+
+Elegant animations but lightweight.
+
+High performance and optimized images.
+
+7. Output Expected
+
+Generate:
+
+File structure
+
+Component structure
+
+React + TypeScript code
+
+CSS/Bootstrap classes
+
+WhatsApp redirect function
+
+Node.js backend endpoints
+
+Supabase schema (orders + admin)
+
+Admin dashboard layout
+
+Deployment instructions
