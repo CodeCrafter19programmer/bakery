@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { products } from '../data/products';
-import { CartItem, Product } from '../types';
+import { CartItem } from '../types';
 import ProductCard from './ProductCard';
 
 interface ProductsProps {
