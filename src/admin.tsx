@@ -116,6 +116,96 @@ function AdminDashboard() {
     }
   };
 
+  const handleCreateProduct = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    try {
+      const payload = {
+        name: newProduct.name,
+        price: Number(newProduct.price),
+        description: newProduct.description,
+        image: newProduct.image,
+        category: newProduct.category,
+      };
+
+      const response = await fetch(`${API_URL}/api/products`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create product');
+      }
+
+      setNewProduct({ name: '', price: '', description: '', image: '', category: 'cake' });
+      fetchProducts();
+    } catch (error) {
+      console.error('Error creating product:', error);
+      alert('Failed to create product');
+    }
+  };
+
+  const handleDeleteProduct = async (id: string) => {
+    if (!window.confirm('Are you sure you want to delete this product?')) return;
+
+    try {
+      const response = await fetch(`${API_URL}/api/products/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok && response.status !== 204) {
+        throw new Error('Failed to delete product');
+      }
+
+      setProducts((prev) => prev.filter((p) => p.id !== id));
+    } catch (error) {
+      console.error('Error deleting product:', error);
+      alert('Failed to delete product');
+    }
+  };
+
+  const handleCreateImage = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    try {
+      const response = await fetch(`${API_URL}/api/gallery`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newImage),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to upload image');
+      }
+
+      setNewImage({ url: '', alt: '' });
+      fetchGallery();
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      alert('Failed to upload image');
+    }
+  };
+
+  const handleDeleteImage = async (id: string) => {
+    if (!window.confirm('Are you sure you want to delete this image?')) return;
+
+    try {
+      const response = await fetch(`${API_URL}/api/gallery/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok && response.status !== 204) {
+        throw new Error('Failed to delete image');
+      }
+
+      setGallery((prev) => prev.filter((img) => img.id !== id));
+    } catch (error) {
+      console.error('Error deleting image:', error);
+      alert('Failed to delete image');
+    }
+  };
+
   const updateOrderStatus = async (orderId: string, status: 'pending' | 'completed') => {
     try {
       await fetch(`${API_URL}/api/orders/${orderId}`, {
