@@ -122,6 +122,24 @@ app.get('/api/products', async (req, res) => {
   }
 });
 
+// Delete product
+app.delete('/api/products/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const { error } = await supabase
+      .from('products')
+      .delete()
+      .eq('id', id);
+
+    if (error) throw error;
+    res.status(204).send();
+  } catch (error) {
+    console.error('Error deleting product:', error);
+    res.status(500).json({ error: 'Failed to delete product' });
+  }
+});
+
 // Upload gallery image
 app.post('/api/gallery', async (req, res) => {
   try {
@@ -153,6 +171,24 @@ app.get('/api/gallery', async (req, res) => {
   } catch (error) {
     console.error('Error fetching gallery:', error);
     res.status(500).json({ error: 'Failed to fetch gallery' });
+  }
+});
+
+// Delete gallery image
+app.delete('/api/gallery/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const { error } = await supabase
+      .from('gallery')
+      .delete()
+      .eq('id', id);
+
+    if (error) throw error;
+    res.status(204).send();
+  } catch (error) {
+    console.error('Error deleting gallery image:', error);
+    res.status(500).json({ error: 'Failed to delete gallery image' });
   }
 });
 
