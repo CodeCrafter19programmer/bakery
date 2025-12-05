@@ -1,4 +1,4 @@
-# Sweet Delights Bakery Website
+# Genesis Cakes  Bakery Website
 
 A beautiful, modern bakery website built with React, TypeScript, Node.js, and Supabase. Features a responsive design with pink and pastel colors, WhatsApp ordering integration, and an admin dashboard.
 
