@@ -103,7 +103,7 @@ html {
   background: linear-gradient(135deg, var(--light-pink) 0%, var(--cream) 50%, var(--pastel-blue) 100%);
   position: relative;
   overflow: hidden;
-  padding: 2rem 0;
+  padding: 7rem 0 2rem;
 }
 
 .hero-section::before {
