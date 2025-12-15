@@ -7,6 +7,7 @@
   --cream: #fff8f0;
   --text-dark: #2d2d2d;
   --text-light: #6b6b6b;
+  --navbar-height: 96px;
 }
 
 * {
@@ -15,20 +16,33 @@
   box-sizing: border-box;
 }
 
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: var(--navbar-height);
+}
+
 body {
   font-family: 'Poppins', sans-serif;
   color: var(--text-dark);
   background-color: var(--cream);
   overflow-x: hidden;
+  padding-top: var(--navbar-height);
+}
+
+@media (max-width: 992px) {
+  :root {
+    --navbar-height: 84px;
+  }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --navbar-height: 72px;
+  }
 }
 
 h1, h2, h3, h4, h5, h6 {
   font-family: 'Playfair Display', serif;
-}
-
-/* Smooth Scroll */
-html {
-  scroll-behavior: smooth;
 }
 
 /* Navbar */
@@ -103,7 +117,7 @@ html {
   background: linear-gradient(135deg, var(--light-pink) 0%, var(--cream) 50%, var(--pastel-blue) 100%);
   position: relative;
   overflow: hidden;
-  padding: 7rem 0 2rem;
+  padding: calc(var(--navbar-height) + 2rem) 0 2rem;
 }
 
 .hero-section::before {
@@ -780,7 +794,7 @@ html {
 
   /* Ensure hero content is not hidden behind fixed navbar on small screens */
   .hero-section {
-    padding-top: 6rem;
+    padding-top: calc(var(--navbar-height) + 2rem);
   }
 }
 
