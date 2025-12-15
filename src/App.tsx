@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { ShoppingCart } from 'lucide-react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './styles/App.css';
 import Navbar from './components/Navbar';
@@ -61,6 +62,15 @@ function App() {
         onRemoveItem={removeFromCart}
         onClearCart={clearCart}
       />
+      <button
+        className={`floating-cart-btn${isCartOpen ? ' active' : ''}`}
+        onClick={toggleCart}
+        aria-label="View cart"
+        type="button"
+      >
+        <ShoppingCart size={26} />
+        {cart.length > 0 && <span className="cart-badge">{cart.length}</span>}
+      </button>
       <div 
         className={`cart-overlay ${isCartOpen ? 'show' : ''}`}
         onClick={toggleCart}
