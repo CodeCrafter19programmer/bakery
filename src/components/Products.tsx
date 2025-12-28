@@ -1,15 +1,30 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { products } from '../data/products';
-import { CartItem } from '../types';
+import { CartItem, Product } from '../types';
 import ProductCard from './ProductCard';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 interface ProductsProps {
   addToCart: (item: CartItem) => void;
 }
 
 const Products = ({ addToCart }: ProductsProps) => {
+  const [products, setProducts] = useState<Product[]>([]);
   const [activeCategory, setActiveCategory] = useState<'all' | 'cake' | 'donut' | 'pastry'>('all');
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch(`${API_URL}/api/products`);
+        const data = await response.json();
+        setProducts(data);
+      } catch (error) {
+        console.error('Error fetching products:', error);
+      }
+    };
+    fetchProducts();
+  }, []);
 
   const filteredProducts = activeCategory === 'all'
     ? products

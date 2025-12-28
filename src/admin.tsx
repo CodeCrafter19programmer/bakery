@@ -712,64 +712,25 @@ function AdminDashboard() {
 
             {activeTab === 'gallery' && (
               <div className="admin-content">
-                <h2 className="mb-4">Gallery Management</h2>
+                <h2 className="mb-4">Gallery</h2>
+                <p className="text-muted mb-4">Images are automatically synced from products. Add products with images to update the gallery.</p>
 
-                <div className="row">
-                  <div className="col-md-6 mb-4">
-                    <h5>Add Gallery Image</h5>
-                    <form onSubmit={handleCreateImage}>
-                      <div className="mb-3">
-                        <label className="form-label">Image URL</label>
-                        <input
-                          type="url"
-                          className="form-control"
-                          value={newImage.url}
-                          onChange={(e) => setNewImage({ ...newImage, url: e.target.value })}
-                          placeholder="https://images.unsplash.com/..."
-                          required
-                        />
-                      </div>
-                      <div className="mb-3">
-                        <label className="form-label">Alt Text</label>
-                        <input
-                          type="text"
-                          className="form-control"
-                          value={newImage.alt}
-                          onChange={(e) => setNewImage({ ...newImage, alt: e.target.value })}
-                          placeholder="Chocolate drip cake"
-                          required
-                        />
-                      </div>
-                      <button type="submit" className="btn btn-primary">Save Image</button>
-                    </form>
-                  </div>
-
-                  <div className="col-md-6">
-                    <h5>Existing Images</h5>
-                    {gallery.length === 0 ? (
-                      <p className="text-muted">No gallery images found.</p>
-                    ) : (
-                      <div className="row g-3">
-                        {gallery.map((img) => (
-                          <div className="col-6" key={img.id}>
-                            <div className="card">
-                              <img src={img.url} alt={img.alt} className="card-img-top" />
-                              <div className="card-body p-2">
-                                <p className="card-text small mb-2">{img.alt}</p>
-                                <button
-                                  className="btn btn-outline-danger btn-sm w-100"
-                                  onClick={() => handleDeleteImage(img.id)}
-                                >
-                                  <Trash2 size={16} /> Remove
-                                </button>
-                              </div>
-                            </div>
+                {gallery.length === 0 ? (
+                  <p className="text-muted">No gallery images found. Add products with images to populate the gallery.</p>
+                ) : (
+                  <div className="row g-3">
+                    {gallery.map((img) => (
+                      <div className="col-6 col-md-4 col-lg-3" key={img.id}>
+                        <div className="card h-100">
+                          <img src={img.url} alt={img.alt} className="card-img-top" style={{ height: '150px', objectFit: 'cover' }} />
+                          <div className="card-body p-2">
+                            <p className="card-text small mb-0 text-truncate">{img.alt}</p>
                           </div>
-                        ))}
+                        </div>
                       </div>
-                    )}
+                    ))}
                   </div>
-                </div>
+                )}
               </div>
             )}
           </div>
