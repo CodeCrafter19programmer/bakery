@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import ReactDOM from 'react-dom/client';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './styles/App.css';
 import './styles/Admin.css';
-import { LogOut, Package, Image as ImageIcon, ShoppingBag, Trash2 } from 'lucide-react';
+import { LogOut, Package, Image as ImageIcon, ShoppingBag, Trash2, Upload, Link } from 'lucide-react';
+import Cropper from 'react-easy-crop';
+import type { Area } from 'react-easy-crop';
 
 interface Order {
   id: string;
@@ -62,6 +64,11 @@ function AdminDashboard() {
 
   const [imageInputType, setImageInputType] = useState<'url' | 'upload'>('url');
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [showCropper, setShowCropper] = useState(false);
+  const [cropImageSrc, setCropImageSrc] = useState<string | null>(null);
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
 
   const [newImage, setNewImage] = useState({
     url: '',
@@ -173,10 +180,10 @@ function AdminDashboard() {
     }
   };
 
-  const handleImageUpload = async (file: File): Promise<string | null> => {
+  const handleImageUpload = async (blob: Blob): Promise<string | null> => {
     const token = localStorage.getItem(TOKEN_KEY);
     const formData = new FormData();
-    formData.append('image', file);
+    formData.append('image', blob, 'cropped-image.jpg');
 
     try {
       setUploadingImage(true);
@@ -199,6 +206,67 @@ function AdminDashboard() {
     } finally {
       setUploadingImage(false);
     }
+  };
+
+  const onCropComplete = useCallback((_croppedArea: Area, croppedAreaPixels: Area) => {
+    setCroppedAreaPixels(croppedAreaPixels);
+  }, []);
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        setCropImageSrc(reader.result as string);
+        setShowCropper(true);
+        setCrop({ x: 0, y: 0 });
+        setZoom(1);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const createCroppedImage = async (): Promise<Blob | null> => {
+    if (!cropImageSrc || !croppedAreaPixels) return null;
+
+    const image = new Image();
+    image.src = cropImageSrc;
+    await new Promise((resolve) => { image.onload = resolve; });
+
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return null;
+
+    canvas.width = croppedAreaPixels.width;
+    canvas.height = croppedAreaPixels.height;
+
+    ctx.drawImage(
+      image,
+      croppedAreaPixels.x,
+      croppedAreaPixels.y,
+      croppedAreaPixels.width,
+      croppedAreaPixels.height,
+      0,
+      0,
+      croppedAreaPixels.width,
+      croppedAreaPixels.height
+    );
+
+    return new Promise((resolve) => {
+      canvas.toBlob((blob) => resolve(blob), 'image/jpeg', 0.9);
+    });
+  };
+
+  const handleCropConfirm = async () => {
+    const croppedBlob = await createCroppedImage();
+    if (croppedBlob) {
+      const url = await handleImageUpload(croppedBlob);
+      if (url) {
+        setNewProduct({ ...newProduct, image: url });
+      }
+    }
+    setShowCropper(false);
+    setCropImageSrc(null);
   };
 
   const handleCreateProduct = async (e: React.FormEvent) => {
@@ -500,48 +568,89 @@ function AdminDashboard() {
                             className={`btn btn-sm ${imageInputType === 'url' ? 'btn-primary' : 'btn-outline-primary'}`}
                             onClick={() => setImageInputType('url')}
                           >
-                            URL
+                            <Link size={14} className="me-1" /> URL
                           </button>
                           <button
                             type="button"
                             className={`btn btn-sm ${imageInputType === 'upload' ? 'btn-primary' : 'btn-outline-primary'}`}
                             onClick={() => setImageInputType('upload')}
                           >
-                            Upload
+                            <Upload size={14} className="me-1" /> Upload
                           </button>
                         </div>
                         {imageInputType === 'url' ? (
                           <input
-                            type="url"
+                            type="text"
                             className="form-control"
                             value={newProduct.image}
                             onChange={(e) => setNewProduct({ ...newProduct, image: e.target.value })}
-                            placeholder="https://images.unsplash.com/..."
-                            required={!newProduct.image}
+                            placeholder="Paste any image URL here..."
                           />
                         ) : (
                           <>
-                            <input
-                              type="file"
-                              className="form-control"
-                              accept="image/*"
-                              onChange={async (e) => {
-                                const file = e.target.files?.[0];
-                                if (file) {
-                                  const url = await handleImageUpload(file);
-                                  if (url) {
-                                    setNewProduct({ ...newProduct, image: url });
-                                  }
-                                }
-                              }}
-                              disabled={uploadingImage}
-                            />
-                            {uploadingImage && <small className="text-muted">Uploading...</small>}
+                            {showCropper && cropImageSrc ? (
+                              <div className="crop-modal">
+                                <div style={{ position: 'relative', width: '100%', height: '250px', background: '#333', borderRadius: '8px', overflow: 'hidden' }}>
+                                  <Cropper
+                                    image={cropImageSrc}
+                                    crop={crop}
+                                    zoom={zoom}
+                                    aspect={1}
+                                    onCropChange={setCrop}
+                                    onZoomChange={setZoom}
+                                    onCropComplete={onCropComplete}
+                                  />
+                                </div>
+                                <div className="mt-2">
+                                  <label className="form-label small">Zoom: {zoom.toFixed(1)}x</label>
+                                  <input
+                                    type="range"
+                                    className="form-range"
+                                    min={1}
+                                    max={3}
+                                    step={0.1}
+                                    value={zoom}
+                                    onChange={(e) => setZoom(Number(e.target.value))}
+                                  />
+                                </div>
+                                <div className="d-flex gap-2 mt-2">
+                                  <button
+                                    type="button"
+                                    className="btn btn-success btn-sm"
+                                    onClick={handleCropConfirm}
+                                    disabled={uploadingImage}
+                                  >
+                                    {uploadingImage ? 'Uploading...' : 'Crop & Save'}
+                                  </button>
+                                  <button
+                                    type="button"
+                                    className="btn btn-outline-secondary btn-sm"
+                                    onClick={() => { setShowCropper(false); setCropImageSrc(null); }}
+                                  >
+                                    Cancel
+                                  </button>
+                                </div>
+                              </div>
+                            ) : (
+                              <input
+                                type="file"
+                                className="form-control"
+                                accept="image/*"
+                                onChange={handleFileSelect}
+                              />
+                            )}
                           </>
                         )}
                         {newProduct.image && (
-                          <div className="mt-2">
-                            <img src={newProduct.image} alt="Preview" style={{ maxWidth: '100px', maxHeight: '100px' }} />
+                          <div className="mt-2 d-flex align-items-center gap-2">
+                            <img src={newProduct.image} alt="Preview" style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '8px' }} />
+                            <button
+                              type="button"
+                              className="btn btn-outline-danger btn-sm"
+                              onClick={() => setNewProduct({ ...newProduct, image: '' })}
+                            >
+                              Remove
+                            </button>
                           </div>
                         )}
                       </div>
