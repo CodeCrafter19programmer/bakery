@@ -60,6 +60,9 @@ function AdminDashboard() {
     category: 'cake' as 'cake' | 'donut' | 'pastry',
   });
 
+  const [imageInputType, setImageInputType] = useState<'url' | 'upload'>('url');
+  const [uploadingImage, setUploadingImage] = useState(false);
+
   const [newImage, setNewImage] = useState({
     url: '',
     alt: '',
@@ -144,7 +147,7 @@ function AdminDashboard() {
 
   const fetchGallery = async () => {
     try {
-      const response = await fetch(`${API_URL}/api/gallery`, {
+      const response = await fetch(`${API_URL}/api/gallery/products`, {
         headers: getAuthHeaders(),
       });
       const data = await response.json();
@@ -167,6 +170,34 @@ function AdminDashboard() {
       setOrders(data);
     } catch (error) {
       console.error('Error fetching orders:', error);
+    }
+  };
+
+  const handleImageUpload = async (file: File): Promise<string | null> => {
+    const token = localStorage.getItem(TOKEN_KEY);
+    const formData = new FormData();
+    formData.append('image', file);
+
+    try {
+      setUploadingImage(true);
+      const response = await fetch(`${API_URL}/api/upload`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to upload image');
+      }
+
+      const data = await response.json();
+      return data.url;
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      alert('Failed to upload image');
+      return null;
+    } finally {
+      setUploadingImage(false);
     }
   };
 
@@ -194,6 +225,7 @@ function AdminDashboard() {
 
       setNewProduct({ name: '', price: '', description: '', image: '', category: 'cake' });
       fetchProducts();
+      fetchGallery();
     } catch (error) {
       console.error('Error creating product:', error);
       alert('Failed to create product');
@@ -461,15 +493,57 @@ function AdminDashboard() {
                         />
                       </div>
                       <div className="mb-3">
-                        <label className="form-label">Image URL</label>
-                        <input
-                          type="url"
-                          className="form-control"
-                          value={newProduct.image}
-                          onChange={(e) => setNewProduct({ ...newProduct, image: e.target.value })}
-                          placeholder="https://images.unsplash.com/..."
-                          required
-                        />
+                        <label className="form-label">Image</label>
+                        <div className="btn-group w-100 mb-2" role="group">
+                          <button
+                            type="button"
+                            className={`btn btn-sm ${imageInputType === 'url' ? 'btn-primary' : 'btn-outline-primary'}`}
+                            onClick={() => setImageInputType('url')}
+                          >
+                            URL
+                          </button>
+                          <button
+                            type="button"
+                            className={`btn btn-sm ${imageInputType === 'upload' ? 'btn-primary' : 'btn-outline-primary'}`}
+                            onClick={() => setImageInputType('upload')}
+                          >
+                            Upload
+                          </button>
+                        </div>
+                        {imageInputType === 'url' ? (
+                          <input
+                            type="url"
+                            className="form-control"
+                            value={newProduct.image}
+                            onChange={(e) => setNewProduct({ ...newProduct, image: e.target.value })}
+                            placeholder="https://images.unsplash.com/..."
+                            required={!newProduct.image}
+                          />
+                        ) : (
+                          <>
+                            <input
+                              type="file"
+                              className="form-control"
+                              accept="image/*"
+                              onChange={async (e) => {
+                                const file = e.target.files?.[0];
+                                if (file) {
+                                  const url = await handleImageUpload(file);
+                                  if (url) {
+                                    setNewProduct({ ...newProduct, image: url });
+                                  }
+                                }
+                              }}
+                              disabled={uploadingImage}
+                            />
+                            {uploadingImage && <small className="text-muted">Uploading...</small>}
+                          </>
+                        )}
+                        {newProduct.image && (
+                          <div className="mt-2">
+                            <img src={newProduct.image} alt="Preview" style={{ maxWidth: '100px', maxHeight: '100px' }} />
+                          </div>
+                        )}
                       </div>
                       <div className="mb-3">
                         <label className="form-label">Category</label>

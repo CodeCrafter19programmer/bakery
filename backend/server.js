@@ -6,6 +6,8 @@ import dotenv from 'dotenv';
 import { createClient } from '@supabase/supabase-js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import multer from 'multer';
+import { randomUUID } from 'crypto';
 
 dotenv.config();
 
@@ -58,6 +60,19 @@ const corsOptions = {
 app.use(helmet());
 app.use(cors(corsOptions));
 app.use(express.json());
+
+// Multer for file uploads (memory storage)
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype.startsWith('image/')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only image files are allowed'));
+    }
+  },
+});
 
 // Rate limiting for login endpoint
 const loginLimiter = rateLimit({
@@ -364,6 +379,62 @@ app.post('/api/orders', async (req, res) => {
   } catch (error) {
     console.error('Error creating order:', error);
     res.status(500).json({ error: 'Failed to create order' });
+  }
+});
+
+// Upload image to Supabase Storage (admin only)
+app.post('/api/upload', requireAdmin, upload.single('image'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No image file provided' });
+    }
+
+    const fileExt = req.file.originalname.split('.').pop();
+    const fileName = `${randomUUID()}.${fileExt}`;
+    const filePath = `products/${fileName}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from('images')
+      .upload(filePath, req.file.buffer, {
+        contentType: req.file.mimetype,
+        upsert: false,
+      });
+
+    if (uploadError) throw uploadError;
+
+    const { data: urlData } = supabase.storage
+      .from('images')
+      .getPublicUrl(filePath);
+
+    res.json({ url: urlData.publicUrl });
+  } catch (error) {
+    console.error('Error uploading image:', error);
+    res.status(500).json({ error: 'Failed to upload image' });
+  }
+});
+
+// Get gallery images from products table
+app.get('/api/gallery/products', async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('products')
+      .select('id, name, image')
+      .not('image', 'is', null)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    
+    // Transform to gallery format
+    const galleryImages = data.map(p => ({
+      id: p.id,
+      url: p.image,
+      alt: p.name,
+    }));
+    
+    res.json(galleryImages);
+  } catch (error) {
+    console.error('Error fetching product gallery:', error);
+    res.status(500).json({ error: 'Failed to fetch gallery' });
   }
 });
 

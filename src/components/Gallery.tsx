@@ -1,8 +1,31 @@
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { galleryImages } from '../data/products';
 import { Eye } from 'lucide-react';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
+interface GalleryImage {
+  id: string;
+  url: string;
+  alt: string;
+}
+
 const Gallery = () => {
+  const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([]);
+
+  useEffect(() => {
+    const fetchGallery = async () => {
+      try {
+        const response = await fetch(`${API_URL}/api/gallery/products`);
+        const data = await response.json();
+        setGalleryImages(data);
+      } catch (error) {
+        console.error('Error fetching gallery:', error);
+      }
+    };
+    fetchGallery();
+  }, []);
+
   return (
     <section id="gallery" className="section gallery-section">
       <div className="container">
