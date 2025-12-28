@@ -1,7 +1,8 @@
 import { X, Trash2 } from 'lucide-react';
 import { CartItem } from '../types';
 import { sendToWhatsApp } from '../utils/whatsapp';
-import { supabase } from '../lib/supabase';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 interface CartSidebarProps {
   cart: CartItem[];
@@ -21,23 +22,24 @@ const CartSidebar = ({ cart, isOpen, onClose, onRemoveItem, onClearCart }: CartS
     }
 
     try {
-      // Save order to Supabase
+      // Save order via backend API
       const orderData = {
         items: cart,
         total,
-        status: 'pending',
         customer_message: cart.map(item => 
           `${item.name} x${item.quantity}${item.customText ? ` - "${item.customText}"` : ''}`
         ).join(', ')
       };
 
-      const { error } = await supabase
-        .from('orders')
-        .insert([orderData]);
+      const response = await fetch(`${API_URL}/api/orders`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(orderData),
+      });
 
-      if (error) {
-        console.error('Error saving order:', error);
-        // Continue with WhatsApp even if Supabase fails
+      if (!response.ok) {
+        console.error('Error saving order:', await response.text());
+        // Continue with WhatsApp even if backend fails
       }
 
       // Send to WhatsApp

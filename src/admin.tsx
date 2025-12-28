@@ -30,11 +30,22 @@ interface GalleryImage {
 }
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const TOKEN_KEY = 'admin_token';
+
+// Helper to get auth headers
+const getAuthHeaders = () => {
+  const token = localStorage.getItem(TOKEN_KEY);
+  return {
+    'Content-Type': 'application/json',
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  };
+};
 
 function AdminDashboard() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [isVerifying, setIsVerifying] = useState(true);
   const [orders, setOrders] = useState<Order[]>([]);
   const [activeTab, setActiveTab] = useState<'orders' | 'products' | 'gallery'>('orders');
   const [loading, setLoading] = useState(false);
@@ -53,6 +64,35 @@ function AdminDashboard() {
     url: '',
     alt: '',
   });
+
+  // Check for existing token on mount
+  useEffect(() => {
+    const verifyToken = async () => {
+      const token = localStorage.getItem(TOKEN_KEY);
+      if (!token) {
+        setIsVerifying(false);
+        return;
+      }
+
+      try {
+        const response = await fetch(`${API_URL}/api/admin/verify`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (response.ok) {
+          setIsLoggedIn(true);
+        } else {
+          localStorage.removeItem(TOKEN_KEY);
+        }
+      } catch (error) {
+        console.error('Token verification failed:', error);
+        localStorage.removeItem(TOKEN_KEY);
+      } finally {
+        setIsVerifying(false);
+      }
+    };
+
+    verifyToken();
+  }, []);
 
   useEffect(() => {
     if (isLoggedIn) {
@@ -73,10 +113,14 @@ function AdminDashboard() {
         body: JSON.stringify({ username, password })
       });
 
-      if (response.ok) {
+      const data = await response.json();
+
+      if (response.ok && data.token) {
+        localStorage.setItem(TOKEN_KEY, data.token);
         setIsLoggedIn(true);
+        setPassword('');
       } else {
-        alert('Invalid credentials');
+        alert(data.error || 'Invalid credentials');
       }
     } catch (error) {
       console.error('Login error:', error);
@@ -88,7 +132,9 @@ function AdminDashboard() {
 
   const fetchProducts = async () => {
     try {
-      const response = await fetch(`${API_URL}/api/products`);
+      const response = await fetch(`${API_URL}/api/products`, {
+        headers: getAuthHeaders(),
+      });
       const data = await response.json();
       setProducts(data);
     } catch (error) {
@@ -98,7 +144,9 @@ function AdminDashboard() {
 
   const fetchGallery = async () => {
     try {
-      const response = await fetch(`${API_URL}/api/gallery`);
+      const response = await fetch(`${API_URL}/api/gallery`, {
+        headers: getAuthHeaders(),
+      });
       const data = await response.json();
       setGallery(data);
     } catch (error) {
@@ -108,7 +156,13 @@ function AdminDashboard() {
 
   const fetchOrders = async () => {
     try {
-      const response = await fetch(`${API_URL}/api/orders`);
+      const response = await fetch(`${API_URL}/api/orders`, {
+        headers: getAuthHeaders(),
+      });
+      if (response.status === 401) {
+        handleLogout();
+        return;
+      }
       const data = await response.json();
       setOrders(data);
     } catch (error) {
@@ -130,7 +184,7 @@ function AdminDashboard() {
 
       const response = await fetch(`${API_URL}/api/products`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
         body: JSON.stringify(payload),
       });
 
@@ -152,6 +206,7 @@ function AdminDashboard() {
     try {
       const response = await fetch(`${API_URL}/api/products/${id}`, {
         method: 'DELETE',
+        headers: getAuthHeaders(),
       });
 
       if (!response.ok && response.status !== 204) {
@@ -171,7 +226,7 @@ function AdminDashboard() {
     try {
       const response = await fetch(`${API_URL}/api/gallery`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
         body: JSON.stringify(newImage),
       });
 
@@ -193,6 +248,7 @@ function AdminDashboard() {
     try {
       const response = await fetch(`${API_URL}/api/gallery/${id}`, {
         method: 'DELETE',
+        headers: getAuthHeaders(),
       });
 
       if (!response.ok && response.status !== 204) {
@@ -208,11 +264,15 @@ function AdminDashboard() {
 
   const updateOrderStatus = async (orderId: string, status: 'pending' | 'completed') => {
     try {
-      await fetch(`${API_URL}/api/orders/${orderId}`, {
+      const response = await fetch(`${API_URL}/api/orders/${orderId}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(),
         body: JSON.stringify({ status })
       });
+      if (response.status === 401) {
+        handleLogout();
+        return;
+      }
       fetchOrders();
     } catch (error) {
       console.error('Error updating order:', error);
@@ -220,10 +280,22 @@ function AdminDashboard() {
   };
 
   const handleLogout = () => {
+    localStorage.removeItem(TOKEN_KEY);
     setIsLoggedIn(false);
     setUsername('');
     setPassword('');
   };
+
+  // Show loading while verifying token
+  if (isVerifying) {
+    return (
+      <div className="admin-login">
+        <div className="login-card">
+          <h1 className="login-title">Loading...</h1>
+        </div>
+      </div>
+    );
+  }
 
   if (!isLoggedIn) {
     return (
