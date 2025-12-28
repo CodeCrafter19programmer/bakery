@@ -19,15 +19,32 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(',').map((o) => o.trim()).filter(Boolean)
   : ['http://localhost:3000', 'http://localhost:5173'];
 
+const isOriginAllowed = (origin) => {
+  if (!origin) return false;
+  const normalizedOrigin = origin.replace(/\/$/, '');
+  const normalizedAllowedOrigins = allowedOrigins.map((o) => o.replace(/\/$/, ''));
+
+  return normalizedAllowedOrigins.some((allowed) => {
+    if (allowed === '*') return true;
+
+    if (allowed.includes('*')) {
+      const escaped = allowed
+        .replace(/[.+?^${}()|[\]\\]/g, '\\$&')
+        .replace(/\*/g, '.*');
+      return new RegExp(`^${escaped}$`).test(normalizedOrigin);
+    }
+
+    return allowed === normalizedOrigin;
+  });
+};
+
 const corsOptions = {
   origin: (origin, callback) => {
     // Allow requests with no origin (mobile apps, Postman, etc.) in dev only
     if (!origin && process.env.NODE_ENV !== 'production') {
       return callback(null, true);
     }
-    const normalizedOrigin = typeof origin === 'string' ? origin.replace(/\/$/, '') : origin;
-    const normalizedAllowedOrigins = allowedOrigins.map((o) => o.replace(/\/$/, ''));
-    if (normalizedAllowedOrigins.includes(normalizedOrigin)) {
+    if (typeof origin === 'string' && isOriginAllowed(origin)) {
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));
