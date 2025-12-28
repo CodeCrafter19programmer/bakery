@@ -16,7 +16,7 @@ const JWT_EXPIRES_IN = '24h';
 
 // CORS configuration - restrict to allowed origins
 const allowedOrigins = process.env.ALLOWED_ORIGINS
-  ? process.env.ALLOWED_ORIGINS.split(',')
+  ? process.env.ALLOWED_ORIGINS.split(',').map((o) => o.trim()).filter(Boolean)
   : ['http://localhost:3000', 'http://localhost:5173'];
 
 const corsOptions = {
@@ -25,7 +25,9 @@ const corsOptions = {
     if (!origin && process.env.NODE_ENV !== 'production') {
       return callback(null, true);
     }
-    if (allowedOrigins.includes(origin)) {
+    const normalizedOrigin = typeof origin === 'string' ? origin.replace(/\/$/, '') : origin;
+    const normalizedAllowedOrigins = allowedOrigins.map((o) => o.replace(/\/$/, ''));
+    if (normalizedAllowedOrigins.includes(normalizedOrigin)) {
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));
