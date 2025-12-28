@@ -219,6 +219,14 @@ app.post('/api/products', requireAdmin, async (req, res) => {
       .select();
 
     if (error) throw error;
+
+    // Auto-sync to gallery if product has an image
+    if (image) {
+      await supabase
+        .from('gallery')
+        .insert([{ url: image, alt: name }]);
+    }
+
     res.json(data[0]);
   } catch (error) {
     console.error('Error creating product:', error);
