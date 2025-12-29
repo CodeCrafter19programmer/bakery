@@ -44,7 +44,7 @@ const Products = ({ addToCart }: ProductsProps) => {
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: 0.45 }}
         >
           <h2 className="section-title">Our Delicious Products</h2>
           <p className="section-subtitle">
@@ -71,7 +71,7 @@ const Products = ({ addToCart }: ProductsProps) => {
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
+                transition={{ duration: 0.35, delay: Math.min(index * 0.03, 0.18) }}
               >
                 <ProductCard product={product} addToCart={addToCart} />
               </motion.div>

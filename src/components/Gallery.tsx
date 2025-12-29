@@ -33,7 +33,7 @@ const Gallery = () => {
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: 0.45 }}
         >
           <h2 className="section-title">Our Gallery</h2>
           <p className="section-subtitle">
@@ -49,7 +49,7 @@ const Gallery = () => {
               initial={{ opacity: 0, scale: 0.9 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
+              transition={{ duration: 0.35, delay: Math.min(index * 0.03, 0.18) }}
             >
               <img src={image.url} alt={image.alt} />
               <div className="gallery-overlay">
